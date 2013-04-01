@@ -1,0 +1,7 @@
+// LoadLibraries.C
+// Author: N. Oblath
+// Date: 4/1/2013
+
+{
+    gSystem->Load("@LIB_INSTALL_DIR@/libROOTPlotter.so");
+}
