@@ -2,7 +2,7 @@
 
 // The name of the package
 #define PACKAGE "${${PROJECT_NAME}_PACKAGE_NAME}"
-#define PACKAGE_NAME "${${PROJECT_NAME}_PACKAGE_NAME@"
+#define PACKAGE_NAME "${${PROJECT_NAME}_PACKAGE_NAME}"
 
 // The name of the package, plus the version and GIT revision number
 #define PACKAGE_STRING ""${${PROJECT_NAME}_PACKAGE_STRING}"

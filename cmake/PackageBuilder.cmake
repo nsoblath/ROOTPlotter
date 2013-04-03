@@ -1,12 +1,12 @@
-# ROOTPlotterBuild.cmake
+# PackageBuilder.cmake
 # Author: Noah Oblath
 # Parts of this script are based on work done by Sebastian Voecking and Marco Haag in the Kasper package
 # Convenient macros and default variable settings for the Katydid build.
 
 if ("${CMAKE_BUILD_TYPE}" STREQUAL "DEBUG")
-    add_definitions(-DROOTPLOTTER_DEBUG)
+    add_definitions(-D${PROJECT_NAME}_DEBUG)
 else ("${CMAKE_BUILD_TYPE}" STREQUAL "DEBUG")
-    remove_definitions(-DROOTPLOTTER_DEBUG)    
+    remove_definitions(-D${PROJECT_NAME}_DEBUG)    
 endif ("${CMAKE_BUILD_TYPE}" STREQUAL "DEBUG")
 
 # Setup the default install prefix
@@ -25,10 +25,12 @@ endif (SET_INSTALL_PREFIX_TO_DEFAULT)
 set (INCLUDE_INSTALL_SUBDIR "include" CACHE PATH "Install subdirectory for headers")
 set (LIB_INSTALL_SUBDIR "lib" CACHE PATH "Install subdirectory for libraries")
 set (BIN_INSTALL_SUBDIR "bin" CACHE PATH "Install subdirectory for binaries")
+set (CONFIG_INSTALL_SUBDIR "config" CACHE PATH "Install subdirectory for config files")
 
 set (INCLUDE_INSTALL_DIR "${CMAKE_INSTALL_PREFIX}/${INCLUDE_INSTALL_SUBDIR}")
 set (LIB_INSTALL_DIR "${CMAKE_INSTALL_PREFIX}/${LIB_INSTALL_SUBDIR}")
 set (BIN_INSTALL_DIR "${CMAKE_INSTALL_PREFIX}/${BIN_INSTALL_SUBDIR}")
+set (CONFIG_INSTALL_DIR "${CMAKE_INSTALL_PREFIX}/${CONFIG_INSTALL_SUBDIR}")
 
 # build shared libraries
 set (BUILD_SHARED_LIBS ON)
@@ -62,7 +64,7 @@ endif ("${isSystemDir}" STREQUAL "-1")
 ##########
 
 # This should be called immediately after setting the project name
-macro (rootplotter_prepare_project VERSION_MAJOR VERSION_MINOR REVISION)
+macro (pbuilder_prepare_project VERSION_MAJOR VERSION_MINOR REVISION)
     # get git revision information
     include (GetGitRevisionDescription)
     git_describe (GIT_REV)
@@ -87,25 +89,44 @@ macro (rootplotter_prepare_project VERSION_MAJOR VERSION_MINOR REVISION)
     endif (EXISTS ${PROJECT_SOURCE_DIR}/${PROJECT_NAME}Config.hh.in)
 endmacro ()
 
-macro (rootplotter_install_libraries)
+macro (pbuilder_install_libraries)
     install (TARGETS ${ARGN} EXPORT ${PROJECT_NAME}Targets DESTINATION ${LIB_INSTALL_DIR})
     #list (APPEND ${PROJECT_NAME}_LIBRARIES ${ARGN})
     set_property (GLOBAL APPEND PROPERTY ${PROJECT_NAME}_LIBRARIES ${ARGN})
     set_target_properties (${ARGN} PROPERTIES INSTALL_NAME_DIR ${LIB_INSTALL_DIR})
 endmacro ()
 
-macro (rootplotter_install_executables)
+macro (pbuilder_install_executables)
     install(TARGETS ${ARGN} EXPORT ${PROJECT_NAME}Targets DESTINATION ${BIN_INSTALL_DIR})
 endmacro ()
 
-macro (rootplotter_install_headers)
+macro (pbuilder_install_headers)
     install(FILES ${ARGN} DESTINATION ${INCLUDE_INSTALL_DIR})
 endmacro ()
 
-macro (rootplotter_install_config)
+macro (pbuilder_install_config)
     install(FILES ${ARGN} DESTINATION ${CONFIG_INSTALL_DIR})
 endmacro ()
 
-macro (rootplotter_install_files DEST_DIR)
+macro (pbuilder_install_files DEST_DIR)
     install(FILES ${ARGN} DESTINATION ${DEST_DIR})
+endmacro ()
+
+# This should be called AFTER all subdirectories with libraries have been called, and all include directories added.
+macro (pbuilder_install_config_files)
+    # Configuration header file
+    if (EXISTS ${PROJECT_BINARY_DIR}/${PROJECT_NAME}Config.hh)
+        # Install location for the configuration header
+        pbuilder_install_headers (${PROJECT_BINARY_DIR}/${PROJECT_NAME}Config.hh)
+    endif (EXISTS ${PROJECT_BINARY_DIR}/${PROJECT_NAME}Config.hh)
+
+    # CMake configuration file
+    get_property(${PROJECT_NAME}_LIBRARIES GLOBAL PROPERTY ${PROJECT_NAME}_LIBRARIES)
+    if (EXISTS ${PROJECT_SOURCE_DIR}/${PROJECT_NAME}Config.cmake.in)
+        # the awkwardness of the following four lines is because for some reason cmake wouldn't just go from .cmake.tmp to .cmake when I tested it.
+        configure_file(${PROJECT_SOURCE_DIR}/${PROJECT_NAME}Config.cmake.in ${CMAKE_INSTALL_PREFIX}/${PROJECT_NAME}Config.cmake.tmp @ONLY)
+        configure_file(${CMAKE_INSTALL_PREFIX}/${PROJECT_NAME}Config.cmake.tmp ${CMAKE_INSTALL_PREFIX}/${PROJECT_NAME}Config.cmake.ppp @ONLY)
+        file (REMOVE ${CMAKE_INSTALL_PREFIX}/${PROJECT_NAME}Config.cmake.tmp)
+        file (RENAME ${CMAKE_INSTALL_PREFIX}/${PROJECT_NAME}Config.cmake.ppp ${CMAKE_INSTALL_PREFIX}/${PROJECT_NAME}Config.cmake)
+    endif (EXISTS ${PROJECT_SOURCE_DIR}/${PROJECT_NAME}Config.cmake.in)
 endmacro ()

@@ -12,7 +12,7 @@ set (CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake/")
 project (ROOTPlotter)
 
 # Include the build script
-include (ROOTPlotterBuild)
+include (PackageBuilder)
 
 # Set the version and associated variables
 rootplotter_prepare_project (0 1 0)
