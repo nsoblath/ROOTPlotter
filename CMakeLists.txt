@@ -15,7 +15,7 @@ project (ROOTPlotter)
 include (PackageBuilder)
 
 # Set the version and associated variables
-rootplotter_prepare_project (0 1 0)
+pbuilder_prepare_project (0 1 0)
 
 if (${CMAKE_SYSTEM_NAME} MATCHES "Linux")
     list (APPEND LIBS rt)
@@ -26,10 +26,10 @@ endif (${CMAKE_SYSTEM_NAME} MATCHES "Linux")
 find_package (ROOT 5.28)
 if (ROOT_FOUND)
     list (APPEND LIBS ${ROOT_LIBRARIES})
+    include_directories (${ROOT_INCLUDE_DIR})
 else (ROOT_FOUND)
     message(FATAL_ERROR "ROOT was not found!")
 endif (ROOT_FOUND)
-include_directories (${ROOT_INCLUDES})
 
 # add an option to build the validation tests
 option (ROOTPlotter_ENABLE_TESTING "Build the validation tests and enable CMake testing" OFF)
@@ -40,10 +40,13 @@ endif (ROOTPlotter_ENABLE_TESTING)
 # Subdirectories
 include_directories (
     ${PROJECT_SOURCE_DIR}/Library
+    ${PROJECT_SOURCE_DIR}/Library/Utility
 )
 
 add_subdirectory (Library)
 #add_subdirectory (Validation)
+
+pbuilder_install_config_files()
 
 # Doxygen documentation can be built with "make doc" (it's not included with the "all" make target)
 # By default it builds in the source tree.

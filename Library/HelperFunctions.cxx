@@ -21,14 +21,15 @@ std::string GetNextCanvasName(const std::string& baseName)
 
     TSeqCollection* listOfCanvases = gROOT->GetListOfCanvases();
     TObject* foundCanvas = NULL;
-    UInt_t iCanvas = 1;
-    while (foundCanvas == NULL)
+    UInt_t iCanvas = 0;
+    do
     {
+        iCanvas++;
         std::stringstream conv;
         conv << iCanvas;
         name = baseName + conv.str();
         foundCanvas = listOfCanvases->FindObject(name.c_str());
-    }
+    } while (foundCanvas != NULL);
 
     return name;
 }

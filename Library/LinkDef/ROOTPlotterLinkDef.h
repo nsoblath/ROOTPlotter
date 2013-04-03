@@ -7,6 +7,10 @@
 #pragma link C++ nestedclasses;
 #pragma link C++ nestedtypedefs;
 
-#pragma link C++ class TMultiPlotter+;
+#pragma link C++ namespace rootplotter;
+
+#pragma link C++ class rootplotter::TMultiPlotter+;
+#pragma link C++ class rootplotter::TPlottable+;
+#pragma link C++ class rootplotter::TPlottableTH1+;
 
 #endif
