@@ -8,54 +8,90 @@
 #ifndef TMULTIPLOTTER_H_
 #define TMULTIPLOTTER_H_
 
-#ifndef ROOT_Rtypes
-#include "Rtypes.h"
-#endif
+//#include "TIFactory.h"
 
+#include "TPlottable.h"
+
+#include "TH1.h"
+
+#include <list>
 #include <string>
 
 class TPad;
 
-class TMultiPlotter
+namespace rootplotter
 {
-    public:
-        TMultiPlotter(const std::string& canvasBaseName = "MPC");
-        TMultiPlotter(TPad* pad);
-        virtual ~TMultiPlotter();
+    class TPlottable;
 
-    public:
-        TPad* GetPad() const;
-        void SetPad(TPad* canvas);
+    class TMultiPlotter
+    {
+        public:
+            TMultiPlotter(const std::string& canvasBaseName = "MPC");
+            TMultiPlotter(TPad* pad);
+            virtual ~TMultiPlotter();
 
-        const std::string& GetCanvasBaseName() const;
-        void SetCanvasBaseName(const std::string& name);
+        public:
+            TPad* GetPad() const;
+            void SetPad(TPad* canvas);
 
-    private:
-        TPad* fPad;
+            const std::string& GetCanvasBaseName() const;
+            void SetCanvasBaseName(const std::string& name);
 
-        std::string fCanvasBaseName;
-};
+        private:
+            TPad* fPad;
 
-inline TPad* TMultiPlotter::GetPad() const
-{
-    return fPad;
-}
+            std::string fCanvasBaseName;
 
-inline void TMultiPlotter::SetPad(TPad* pad)
-{
-    fPad = pad;
-    return;
-}
+            TH1C fPlotArea;
 
-inline const std::string& TMultiPlotter::GetCanvasBaseName() const
-{
-    return fCanvasBaseName;
-}
+        public:
+            //template< class XToPlot >
+            //Bool_t AddPlottable(XToPlot* toPlot);
+            Bool_t AddPlottableTH1(TH1* toPlot);
 
-inline void TMultiPlotter::SetCanvasBaseName(const std::string& name)
-{
-    fCanvasBaseName = name;
-    return;
-}
+            void Draw();
+
+        private:
+            std::list< TPlottable* > fPlottables;
+
+            ClassDef(rootplotter::TMultiPlotter, 1);
+    };
+
+    inline TPad* TMultiPlotter::GetPad() const
+    {
+        return fPad;
+    }
+
+    inline void TMultiPlotter::SetPad(TPad* pad)
+    {
+        fPad = pad;
+        return;
+    }
+
+    inline const std::string& TMultiPlotter::GetCanvasBaseName() const
+    {
+        return fCanvasBaseName;
+    }
+
+    inline void TMultiPlotter::SetCanvasBaseName(const std::string& name)
+    {
+        fCanvasBaseName = name;
+        return;
+    }
+
+    /*
+    template< class XToPlot >
+    Bool_t TMultiPlotter::AddPlottable(XToPlot* toPlot)
+    {
+        TIFactory< TPlottable >* plottableFactory = TIFactory< TPlottable >::GetInstance();
+
+
+
+        //TPlottable* newPlottable = new TDerivedPlottable< XToPlot >(plottable);
+        return true;
+    }
+    */
+
+} // end namespace rootplotter
 
 #endif /* TMULTIPLOTTER_H_ */

@@ -23,11 +23,11 @@ namespace rootplotter
     class TIFactory;
 
     template< class XBaseType >
-    class KTTIRegistrar
+    class TIRegistrar
     {
         public:
-            KTTIRegistrar() {}
-            virtual ~KTTIRegistrar() {}
+            TIRegistrar() {}
+            virtual ~TIRegistrar() {}
 
         public:
             friend class TIFactory< XBaseType >;
@@ -38,11 +38,11 @@ namespace rootplotter
     };
 
     template< class XBaseType, class XDerivedType >
-    class KTDerivedTIRegistrar : public KTTIRegistrar< XBaseType >
+    class DerivedTIRegistrar : public TIRegistrar< XBaseType >
     {
         public:
-            KTDerivedTIRegistrar();
-            virtual ~KTDerivedTIRegistrar();
+            DerivedTIRegistrar();
+            virtual ~DerivedTIRegistrar();
 
         protected:
             void Register() const;
@@ -65,7 +65,7 @@ namespace rootplotter
             };
 
         public:
-            typedef std::map< const std::type_info*, const KTTIRegistrar< XBaseType >* > FactoryMap;
+            typedef std::map< const std::type_info*, const TIRegistrar< XBaseType >* > FactoryMap;
             typedef typename FactoryMap::value_type FactoryEntry;
             typedef typename FactoryMap::iterator FactoryIt;
             typedef typename FactoryMap::const_iterator FactoryCIt;
@@ -77,7 +77,7 @@ namespace rootplotter
             XBaseType* Create(const FactoryCIt& iter);
 
             template< class XDerivedType >
-            void Register(const KTTIRegistrar< XBaseType >* registrar);
+            void Register(const TIRegistrar< XBaseType >* registrar);
 
             FactoryCIt GetFactoryMapBegin() const;
             FactoryCIt GetFactoryMapEnd() const;
@@ -115,7 +115,7 @@ namespace rootplotter
 
     template< class XBaseType >
     template< class XDerivedType >
-    void TIFactory< XBaseType >::Register(const KTTIRegistrar< XBaseType >* registrar)
+    void TIFactory< XBaseType >::Register(const TIRegistrar< XBaseType >* registrar)
     {
         FactoryCIt it = fMap->find(&typeid(XDerivedType));
         if (it != fMap->end())
@@ -123,7 +123,7 @@ namespace rootplotter
             std::cerr <<  "ERROR (TIFactory::Create):Already have factory registered for type <" << typeid(XDerivedType).name() << ">." << std::endl;
             return;
         }
-        fMap->insert(std::pair< const std::type_info*, const KTTIRegistrar< XBaseType >* >(&typeid(XDerivedType), registrar));
+        fMap->insert(std::pair< const std::type_info*, const TIRegistrar< XBaseType >* >(&typeid(XDerivedType), registrar));
 #ifdef DEBUG
         std::cout <<  "(TIFactory::Create): Registered a factory for class type " << typeid(XDerivedType).name() << ", factory #" << fMap->size()-1 << std::endl;
 #endif
@@ -156,29 +156,29 @@ namespace rootplotter
 
 
     template< class XBaseType, class XDerivedType >
-    KTDerivedTIRegistrar< XBaseType, XDerivedType >::KTDerivedTIRegistrar() :
-            KTTIRegistrar< XBaseType >()
+    DerivedTIRegistrar< XBaseType, XDerivedType >::DerivedTIRegistrar() :
+            TIRegistrar< XBaseType >()
     {
         Register();
     }
 
     template< class XBaseType, class XDerivedType >
-    KTDerivedTIRegistrar< XBaseType, XDerivedType >::~KTDerivedTIRegistrar()
+    DerivedTIRegistrar< XBaseType, XDerivedType >::~DerivedTIRegistrar()
     {}
 
     template< class XBaseType, class XDerivedType >
-    void KTDerivedTIRegistrar< XBaseType, XDerivedType >::Register() const
+    void DerivedTIRegistrar< XBaseType, XDerivedType >::Register() const
     {
         TIFactory< XBaseType >::GetInstance()->template Register<XDerivedType>(this);
         return;
     }
 
     template< class XBaseType, class XDerivedType >
-    XBaseType* KTDerivedTIRegistrar< XBaseType, XDerivedType >::Create() const
+    XBaseType* DerivedTIRegistrar< XBaseType, XDerivedType >::Create() const
     {
         return dynamic_cast< XBaseType* >(new XDerivedType());
     }
 
 
 } /* namespace Katydid */
-#endif /* KTTIFACTORY_HH_ */
+#endif /* TIFACTORY_HH_ */
