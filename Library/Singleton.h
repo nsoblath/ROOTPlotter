@@ -1,7 +1,7 @@
 #ifndef SINGLETON_H_
 #define SINGLETON_H_
 
-#include "Destroyer.hh"
+#include "Destroyer.h"
 
 #include <cstddef>
 

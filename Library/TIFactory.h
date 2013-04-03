@@ -10,7 +10,7 @@
 #ifndef TIFACTORY_HH_
 #define TIFACTORY_HH_
 
-#include "Singleton.hh"
+#include "Singleton.h"
 
 #include <iostream>
 #include <map>
