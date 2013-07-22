@@ -47,6 +47,8 @@ namespace rootplotter
 
     TMultiPlotter::~TMultiPlotter()
     {
+        delete fPlotArea;
+        if (fOwnPad) delete fPad;
     }
 
     Bool_t TMultiPlotter::AddPlottableTH1(TH1* toPlot)
