@@ -39,15 +39,21 @@ namespace rootplotter
 
         private:
             TPad* fPad;
+            Bool_t fOwnPad;
 
             std::string fCanvasBaseName;
 
-            TH1C fPlotArea;
+            TH1C* fPlotArea;
 
         public:
             //template< class XToPlot >
             //Bool_t AddPlottable(XToPlot* toPlot);
             Bool_t AddPlottableTH1(TH1* toPlot);
+
+            void SetTitle(const std::string& title);
+            void SetXTitle(const std::string& title);
+            void SetYTitle(const std::string& title);
+            void SetZTitle(const std::string& title);
 
             void Draw();
 
@@ -62,12 +68,6 @@ namespace rootplotter
         return fPad;
     }
 
-    inline void TMultiPlotter::SetPad(TPad* pad)
-    {
-        fPad = pad;
-        return;
-    }
-
     inline const std::string& TMultiPlotter::GetCanvasBaseName() const
     {
         return fCanvasBaseName;
@@ -78,6 +78,32 @@ namespace rootplotter
         fCanvasBaseName = name;
         return;
     }
+
+    inline void TMultiPlotter::SetTitle(const std::string& title)
+    {
+        fPlotArea->SetTitle(title.c_str());
+        return;
+    }
+
+    inline void TMultiPlotter::SetXTitle(const std::string& title)
+    {
+        fPlotArea->SetXTitle(title.c_str());
+        return;
+    }
+
+    inline void TMultiPlotter::SetYTitle(const std::string& title)
+    {
+        fPlotArea->SetYTitle(title.c_str());
+        return;
+    }
+
+    inline void TMultiPlotter::SetZTitle(const std::string& title)
+    {
+        fPlotArea->SetZTitle(title.c_str());
+        return;
+    }
+
+
 
     /*
     template< class XToPlot >

@@ -10,6 +10,7 @@
 #include "TROOT.h"
 #include "TSeqCollection.h"
 
+//#include <iostream>
 #include <sstream>
 
 
@@ -20,7 +21,7 @@ std::string GetNextCanvasName(const std::string& baseName)
     std::string name;
 
     TSeqCollection* listOfCanvases = gROOT->GetListOfCanvases();
-    TObject* foundCanvas = NULL;
+    TObject* foundCanvas = listOfCanvases;
     UInt_t iCanvas = 0;
     do
     {

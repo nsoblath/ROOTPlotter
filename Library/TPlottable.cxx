@@ -16,7 +16,8 @@ ClassImp(rootplotter::TPlottable);
 namespace rootplotter
 {
 
-    TPlottable::TPlottable()
+    TPlottable::TPlottable() :
+            fDrawOpts("][")
     {
     }
 
