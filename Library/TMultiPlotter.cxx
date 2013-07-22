@@ -90,7 +90,13 @@ namespace rootplotter
         fPlotArea->GetYaxis()->SetRangeUser(yMin, yMax);
         fPlotArea->Draw();
 
-        for (it = fPlottables.begin(); it != fPlottables.end(); it++)
+        DrawSame();
+        return;
+    }
+
+    void TMultiPlotter::DrawSame()
+    {
+        for (std::list< TPlottable* >::iterator it = fPlottables.begin(); it != fPlottables.end(); it++)
         {
             (*it)->DrawSame();
         }

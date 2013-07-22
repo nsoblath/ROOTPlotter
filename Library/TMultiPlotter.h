@@ -56,6 +56,7 @@ namespace rootplotter
             void SetZTitle(const std::string& title);
 
             void Draw();
+            void DrawSame();
 
         private:
             std::list< TPlottable* > fPlottables;
