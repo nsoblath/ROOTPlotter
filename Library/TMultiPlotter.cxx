@@ -107,6 +107,7 @@ namespace rootplotter
     {
         if (fOwnPad) delete pad;
         fPad = pad;
+        fOwnPad = false;
         return;
     }
 
