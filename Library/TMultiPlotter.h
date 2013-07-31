@@ -55,11 +55,23 @@ namespace rootplotter
             void SetYTitle(const std::string& title);
             void SetZTitle(const std::string& title);
 
+            void SetXDrawRange(Double_t xMin, Double_t xMax);
+            void UnsetXDrawRange();
+
+            void SetYDrawRange(Double_t yMin, Double_t yMax);
+            void UnsetYDrawRange();
+
             void Draw();
             void DrawSame();
 
         private:
             std::list< TPlottable* > fPlottables;
+
+            Bool_t fUseXRange;
+            Double_t fXMin, fXMax;
+
+            Bool_t fUseYRange;
+            Double_t fYMin, fYMax;
 
             ClassDef(rootplotter::TMultiPlotter, 1);
     };
@@ -101,6 +113,34 @@ namespace rootplotter
     inline void TMultiPlotter::SetZTitle(const std::string& title)
     {
         fPlotArea->SetZTitle(title.c_str());
+        return;
+    }
+
+    inline void TMultiPlotter::SetXDrawRange(Double_t xMin, Double_t xMax)
+    {
+        fXMin = xMin;
+        fXMax = xMax;
+        fUseXRange = true;
+        return;
+    }
+
+    inline void TMultiPlotter::UnsetXDrawRange()
+    {
+        fUseXRange = false;
+        return;
+    }
+
+    inline void TMultiPlotter::SetYDrawRange(Double_t yMin, Double_t yMax)
+    {
+        fYMin = yMin;
+        fYMax = yMax;
+        fUseYRange = true;
+        return;
+    }
+
+    inline void TMultiPlotter::UnsetYDrawRange()
+    {
+        fUseYRange = false;
         return;
     }
 

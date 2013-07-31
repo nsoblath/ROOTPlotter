@@ -25,12 +25,16 @@ namespace rootplotter
             fOwnPad(true),
             fCanvasBaseName(canvasBaseName),
             fPlotArea(NULL),
-            fPlottables()
+            fPlottables(),
+            fUseXRange(false), fXMin(0.), fXMax(0.),
+            fUseYRange(false), fYMin(0.), fYMax(0.)
     {
         std::string canvasName = GetNextCanvasName(fCanvasBaseName);
         fPad = new TCanvas(canvasName.c_str(), canvasName.c_str());
         std::string histName = std::string("hPlotArea") + canvasName;
         fPlotArea = new TH1C(histName.c_str(), "Plot Area", 1, 0., 1.);
+        fPlotArea->SetBit(kCanDelete);
+        fPlotArea->SetBinContent(1, 1);
     }
 
     TMultiPlotter::TMultiPlotter(TPad* pad) :
@@ -38,17 +42,21 @@ namespace rootplotter
             fOwnPad(false),
             fCanvasBaseName("MPC"),
             fPlotArea(NULL),
-            fPlottables()
+            fPlottables(),
+            fUseXRange(false), fXMin(0.), fXMax(0.),
+            fUseYRange(false), fYMin(0.), fYMax(0.)
     {
         pad->cd();
         std::string histName = std::string("hPlotArea") + std::string(pad->GetName());
         fPlotArea = new TH1C(histName.c_str(), "Plot Area", 1, 0., 1.);
+        fPlotArea->SetBit(kCanDelete);
+        fPlotArea->SetBinContent(1, 1);
     }
 
     TMultiPlotter::~TMultiPlotter()
     {
-        delete fPlotArea;
         if (fOwnPad) delete fPad;
+        //delete fPlotArea;
     }
 
     Bool_t TMultiPlotter::AddPlottableTH1(TH1* toPlot)
@@ -67,28 +75,40 @@ namespace rootplotter
         std::list< TPlottable* >::iterator it = fPlottables.begin();
         (*it)->Draw();
         fPad->Update();
-        Double_t xMin = fPad->GetUxmin();
-        Double_t xMax = fPad->GetUxmax();
-        Double_t yMin = fPad->GetUymin();
-        Double_t yMax = fPad->GetUymax();
+        if (! fUseXRange)
+        {
+            fXMin = fPad->GetUxmin();
+            fXMax = fPad->GetUxmax();
+        }
+        if (! fUseYRange)
+        {
+            fYMin = fPad->GetUymin();
+            fYMax = fPad->GetUymax();
+        }
         //std::cout << "drawn first hist" << std::endl;
-        //std::cout << xMin << "  " << xMax << "  " << yMin << "  " << yMax << std::endl;
+        //std::cout << fXMin << "  " << fXMax << "  " << fYMin << "  " << fYMax << std::endl;
 
         for (it++; it != fPlottables.end(); it++)
         {
             (*it)->Draw();
             fPad->Update();
-            xMin = TMath::Min(xMin, fPad->GetUxmin());
-            xMax = TMath::Max(xMax, fPad->GetUxmax());
-            yMin = TMath::Min(yMin, fPad->GetUymin());
-            yMax = TMath::Max(yMax, fPad->GetUymax());
+            if (! fUseXRange)
+            {
+                fXMin = TMath::Min(fXMin, fPad->GetUxmin());
+                fXMax = TMath::Max(fXMax, fPad->GetUxmax());
+            }
+            if (! fUseYRange)
+            {
+                fYMin = TMath::Min(fYMin, fPad->GetUymin());
+                fYMax = TMath::Max(fYMax, fPad->GetUymax());
+            }
             //std::cout << "drawn next hist" << std::endl;
             //std::cout << xMin << "  " << xMax << "  " << yMin << "  " << yMax << std::endl;
         }
 
-        fPlotArea->GetXaxis()->SetLimits(xMin, xMax);
-        fPlotArea->GetYaxis()->SetRangeUser(yMin, yMax);
-        fPlotArea->Draw();
+        fPlotArea->GetXaxis()->SetLimits(fXMin, fXMax);
+        fPlotArea->GetYaxis()->SetRangeUser(fYMin, fYMax);
+        fPlotArea->Draw("axis");
 
         DrawSame();
         return;
@@ -105,7 +125,11 @@ namespace rootplotter
 
     void TMultiPlotter::SetPad(TPad* pad)
     {
-        if (fOwnPad) delete pad;
+        if (fOwnPad)
+        {
+            fPad->GetListOfPrimitives()->Remove(fPlotArea);
+            delete fPad;
+        }
         fPad = pad;
         fOwnPad = false;
         return;
